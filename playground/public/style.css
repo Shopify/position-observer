@@ -1,0 +1,139 @@
+:root {
+  --color-outline: rgba(255, 255, 255, 0.3);
+
+  position: relative;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 200vh;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+}
+
+h1 {
+  position: sticky;
+  margin: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+#app {
+  position: relative;
+  margin: 0 auto;
+  margin-top: 100px;
+  padding: 2rem;
+  text-align: center;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 70svh;
+  aspect-ratio: 1 / 1;
+  max-width: 90vw;
+  min-width: 320px;
+  min-height: 110px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  resize: both;
+}
+
+#wrapper {
+  padding: 200px;
+  padding-right: 800px;
+  padding-bottom: 800px;
+}
+
+.target {
+  position: relative;
+  touch-action: none;
+  cursor: grab;
+  padding: 10px;
+}
+
+.target img:not(.resize-handle) {
+  height: 100%;
+  width: 100%;
+}
+
+#target {
+  position: absolute;
+  top: calc(50% - 7.5em);
+  left: calc(50% - 7.5em);
+  height: 15em;
+  width: 15em;
+}
+
+#target2 {
+  position: absolute;
+  top: calc(100svh - 3em);
+  left: calc(50vw - 5em);
+  height: 10em;
+  width: 10em;
+}
+
+#target3 {
+  position: absolute;
+  bottom: 100px;
+  right: calc(50vw - 10em);
+  height: 20em;
+  width: 20em;
+}
+
+.debug {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.debug:not(.debug--intersection) {
+  outline: 1px dashed var(--color-outline);
+  outline-offset: -1px;
+}
+
+.debug--intersection {
+  background-color: rgba(110, 227, 118, 0.3);
+}
+
+.resize-handle {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  padding-left: 10px;
+  padding-top: 10px;
+  width: 15px;
+  height: 15px;
+  opacity: 0.5;
+  cursor: nwse-resize;
+  filter: invert(1);
+  pointer-events: auto;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+   --color-outline: rgba(0, 0, 0, 0.3);
+
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  .debug--intersection {
+    background-color: rgba(110, 227, 118, 0.5);
+  }
+
+  .resize-handle {
+    filter: none;
+  }
+}
