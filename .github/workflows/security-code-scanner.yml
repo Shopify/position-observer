@@ -1,0 +1,7 @@
+on: [push]
+
+jobs:
+  Security-Code-Scanner:
+    uses: shopify/security-code-scanner/.github/workflows/main.yml@main
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
