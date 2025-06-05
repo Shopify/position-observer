@@ -49,6 +49,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "npm@10.9.2",
-  "workspaces": []
+  "packageManager": "npm@10.9.2"
 }
