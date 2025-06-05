@@ -21,7 +21,7 @@ export class PositionObserverTestHelper {
       root?: Element | null;
     }
   ): Promise<PositionObserverTestResult> {
-    const timeout = options?.timeout ?? 10000; // Increased default timeout
+    const timeout = options?.timeout ?? 5000;
     const expectedCalls = options?.expectedCalls ?? 1;
 
     // @ts-expect-error - This is a workaround to fix the type error
@@ -95,15 +95,15 @@ export class PositionObserverTestHelper {
   ): Promise<PositionObserverTestResult> {
     const promise = this.createObserver(element, {
       expectedCalls,
-      timeout: options?.timeout ?? 10000, // Increased timeout
+      timeout: options?.timeout,
       root: options?.root,
     });
 
-    // If an action is provided, execute it after a longer delay for WebKit
+    // If an action is provided, execute it after a short delay
     if (action) {
       setTimeout(async () => {
         await action();
-      }, 100); // Increased delay from 50ms to 100ms
+      }, 50);
     }
 
     return promise;
@@ -140,11 +140,8 @@ export class PositionObserverTestHelper {
             (el as HTMLElement).style.height = `${dims.height}px`;
           }
         }, dimensions);
-
-        // Add a small delay to ensure style changes are processed
-        await new Promise((resolve) => setTimeout(resolve, 50));
       },
-      { timeout: options?.timeout ?? 10000 }
+      { timeout: options?.timeout }
     );
   }
 
@@ -167,11 +164,8 @@ export class PositionObserverTestHelper {
           if (pos.y !== undefined) transforms.push(`translateY(${pos.y}px)`);
           htmlEl.style.transform = transforms.join(" ");
         }, position);
-
-        // Add a small delay to ensure transform changes are processed
-        await new Promise((resolve) => setTimeout(resolve, 50));
       },
-      { timeout: options?.timeout ?? 10000 }
+      { timeout: options?.timeout }
     );
   }
 
