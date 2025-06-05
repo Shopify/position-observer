@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@1.5.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "Shopify/positionobserver" }
+  ],
+  "commit": false,
+  "access": "public",
+  "baseBranch": "main",
+  "ignore": [],
+  "snapshot": {
+    "useCalculatedVersion": true
+  }
+}
