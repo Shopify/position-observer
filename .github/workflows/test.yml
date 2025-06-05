@@ -21,10 +21,18 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install playground dependencies
-        run: cd playground && npm ci
+        run: cd playground && npm install
+
+      - name: Build package
+        run: npm run build
+
+      - name: Setup home directory
+        run: |
+          mkdir -p /tmp/playwright-home
+          chmod 755 /tmp/playwright-home
 
       - name: Start dev server
         run: |
@@ -43,6 +51,8 @@ jobs:
 
       - name: Run Playwright tests
         run: npm run test
+        env:
+          HOME: /tmp/playwright-home
 
       - uses: actions/upload-artifact@v4
         if: always()

@@ -21,12 +21,10 @@ test.describe("PositionObserver", () => {
       expectedCalls: 1,
     });
 
-    // Much cleaner assertions
     expect(result).toHaveBeenCalledTimes(1);
     expect(result).toHaveEntries(1);
     expect(result).toBeIntersecting();
 
-    // Verify against actual element dimensions
     const boundingBox = await page.locator("#target").boundingBox();
     if (boundingBox) {
       expect(result).toHaveLastEntryWithDimensions({
@@ -39,13 +37,11 @@ test.describe("PositionObserver", () => {
   test("should invoke the callback when element size changes", async ({
     positionObserver,
   }) => {
-    // This replaces ~40 lines of complex Promise-based code!
     const result = await positionObserver.resizeElementAndWait("#target", {
       width: 200,
       height: 150,
     });
 
-    // Clean, readable assertions
     expect(result).toHaveBeenCalledTimes(2);
     expect(result).toHaveEntries(2);
     expect(result).toHaveAllEntriesIntersecting();
@@ -53,7 +49,6 @@ test.describe("PositionObserver", () => {
     expect(result).toHaveDifferentDimensionsBetweenEntries();
   });
 
-  // Additional test scenarios made easy
   test("should invoke the callback when element is moved", async ({
     positionObserver,
   }) => {

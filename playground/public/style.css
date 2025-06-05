@@ -60,6 +60,7 @@ h1 {
   touch-action: none;
   cursor: grab;
   padding: 10px;
+  box-sizing: border-box;
 }
 
 .target img:not(.resize-handle) {

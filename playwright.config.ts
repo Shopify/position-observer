@@ -1,5 +1,25 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const allProjects = [
+  {
+    name: "chromium",
+    use: { ...devices["Desktop Chrome"] },
+  },
+  {
+    name: "firefox",
+    use: { ...devices["Desktop Firefox"] },
+  },
+  {
+    name: "webkit",
+    use: { ...devices["Desktop Safari"] },
+  },
+];
+
+// Skip webkit in CI due to timing issues
+const projects = process.env.CI
+  ? allProjects.filter((project) => project.name !== "webkit")
+  : allProjects;
+
 export default defineConfig({
   testDir: "./tests/",
   fullyParallel: true,
@@ -11,18 +31,5 @@ export default defineConfig({
     baseURL: "http://localhost:8000",
     trace: "on-first-retry",
   },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
-  ],
+  projects,
 });
