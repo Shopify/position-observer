@@ -1,3 +1,5 @@
+name: Security code scanner
+
 on: [push]
 
 jobs:
