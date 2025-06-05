@@ -107,7 +107,7 @@ document.addEventListener("pointermove", (event) => {
   const x = isNaN(currentX) ? 1 : currentX;
   const y = isNaN(currentY) ? 1 : currentY;
 
-  element.style.scale = `${x + movementX / 125} ${y + movementY / 125}`;
+  element.style.scale = `${x + movementX / 150} ${y + movementY / 150}`;
 });
 
 document.addEventListener("pointerup", (event) => {
