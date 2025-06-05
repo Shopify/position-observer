@@ -19,4 +19,4 @@ jobs:
       - uses: Shopify/shopify-cla-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          cla-token: ${{ secrets.CLA_TOKEN }}
+          cla-token: ${{ secrets.GITHUB_TOKEN }}
