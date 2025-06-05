@@ -97,22 +97,26 @@ export class PositionIntersectionObserver {
       this.#clientRect = boundingClientRect;
 
       const previousIntersectionRatio = this.#previousIntersectionRatio;
+      const clientRectChanged = !Rect.equals(
+        boundingClientRect,
+        previousClientRect
+      );
 
       if (
         intersectionRatio !== this.#previousIntersectionRatio ||
-        !Rect.equals(boundingClientRect, previousClientRect)
+        clientRectChanged
       ) {
         const rootBounds = this.#options.rootBounds;
-        const intersectionRect = Rect.intersect(boundingClientRect, rootBounds);
+        const rootIntersection = Rect.intersect(boundingClientRect, rootBounds);
 
-        if (intersectionRect.width === 0 || intersectionRect.height === 0) {
+        if (rootIntersection.width === 0 || rootIntersection.height === 0) {
           // The element is not visible, the visibility observer will handle it.
           return;
         }
 
         this.#previousIntersectionRatio = intersectionRatio;
 
-        if (previousIntersectionRatio != null) {
+        if (previousIntersectionRatio != null || clientRectChanged) {
           this.#callback([entry], this);
           this.#observe(entry.target);
         }
