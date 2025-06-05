@@ -7,7 +7,7 @@
   "commit": false,
   "access": "public",
   "baseBranch": "main",
-  "ignore": [],
+  "ignore": ["playground"],
   "snapshot": {
     "useCalculatedVersion": true
   }
