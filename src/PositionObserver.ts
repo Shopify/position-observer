@@ -231,21 +231,18 @@ export class PositionObserver {
    * The callback function to be invoked when the position changes.
    */
   #onPositionChange: PositionIntersectionObserverCallback = (
-    entries,
+    entry,
     observer
   ) => {
-    this.#notify(
-      entries.map(
-        (entry) =>
-          new PositionObserverEntry(
-            entry.target,
-            entry.boundingClientRect,
-            observer.visibleRect,
-            entry.isIntersecting,
-            this.#rootBoundsObserver.rootBounds
-          )
-      )
-    );
+    this.#notify([
+      new PositionObserverEntry(
+        entry.target,
+        entry.boundingClientRect,
+        observer.visibleRect,
+        entry.isIntersecting,
+        this.#rootBoundsObserver.rootBounds
+      ),
+    ]);
   };
 
   /**

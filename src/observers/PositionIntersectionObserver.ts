@@ -10,7 +10,7 @@ export interface PositionIntersectionObserverOptions {
 }
 
 export type PositionIntersectionObserverCallback = (
-  entries: IntersectionObserverEntry[],
+  entry: PositionIntersectionObserverEntry,
   observer: PositionIntersectionObserver
 ) => void;
 
@@ -108,8 +108,10 @@ export class PositionIntersectionObserver {
       ) {
         const rootBounds = this.#options.rootBounds;
         const rootIntersection = Rect.intersect(boundingClientRect, rootBounds);
+        const isIntersecting =
+          rootIntersection.width > 0 && rootIntersection.height > 0;
 
-        if (rootIntersection.width === 0 || rootIntersection.height === 0) {
+        if (!isIntersecting) {
           // The element is not visible, the visibility observer will handle it.
           return;
         }
@@ -117,7 +119,16 @@ export class PositionIntersectionObserver {
         this.#previousIntersectionRatio = intersectionRatio;
 
         if (previousIntersectionRatio != null || clientRectChanged) {
-          this.#callback([entry], this);
+          this.#callback(
+            new PositionIntersectionObserverEntry(
+              entry.target,
+              boundingClientRect,
+              entry.intersectionRect,
+              isIntersecting,
+              rootBounds
+            ),
+            this
+          );
           this.#observe(entry.target);
         }
       }
@@ -130,4 +141,14 @@ export class PositionIntersectionObserver {
   public disconnect() {
     this.#observer?.disconnect();
   }
+}
+
+class PositionIntersectionObserverEntry {
+  constructor(
+    public target: Element,
+    public boundingClientRect: DOMRect,
+    public intersectionRect: DOMRect,
+    public isIntersecting: boolean,
+    public rootBounds: DOMRect
+  ) {}
 }
