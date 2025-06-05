@@ -1,0 +1,5 @@
+---
+"positionobserver": major
+---
+
+Initial release
