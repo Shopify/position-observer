@@ -125,7 +125,7 @@ function createDebugElement(name: string) {
 
   if (name === "rect") {
     const resizeHandle = document.createElement("img");
-    resizeHandle.src = "/resize-handle.svg";
+    resizeHandle.src = `${import.meta.env.BASE_URL}resize-handle.svg`;
     resizeHandle.classList.add("resize-handle");
     element.append(resizeHandle);
   }
