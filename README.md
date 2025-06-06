@@ -18,7 +18,7 @@ The underlying implementation avoids polling mechanisms and optimizes performanc
 ## Installation
 
 ```bash
-npm install positionobserver
+npm install position-observer
 ```
 
 ## Constructor
@@ -97,7 +97,7 @@ Represents a single observation result containing geometric information about an
 ### Basic usage
 
 ```js
-import { PositionObserver } from "positionobserver";
+import { PositionObserver } from "position-observer";
 
 const observer = new PositionObserver((entries) => {
   entries.forEach((entry) => {
@@ -115,7 +115,7 @@ observer.observe(element);
 ### Position tracking
 
 ```js
-import { PositionObserver } from "positionobserver";
+import { PositionObserver } from "position-observer";
 
 const observer = new PositionObserver((entries) => {
   entries.forEach((entry) => {
@@ -175,7 +175,7 @@ npm install
 ### Project structure
 
 ```
-positionobserver/
+position-observer/
 ├── src/                    # Source code
 │   ├── PositionObserver.ts # Main PositionObserver class
 │   ├── observers/          # Internal observer implementations
