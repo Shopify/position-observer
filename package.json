@@ -13,6 +13,7 @@
     "README.md",
     "LICENSE"
   ],
+  "repository": "github:shopify/position-observer",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
