@@ -43,7 +43,7 @@ jobs:
         run: cd playground && npm ci
 
       - name: Build playground for GitHub Pages
-        run: cd playground && npm run build
+        run: cd playground && VITE_BASE_PATH=/position-observer/ npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
