@@ -4,4 +4,4 @@
 
 ### Major Changes
 
-- 9a3b6b8: Initial release
+Initial release
