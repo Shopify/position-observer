@@ -78,7 +78,7 @@ h1 {
 
 #target2 {
   position: absolute;
-  top: calc(100svh - 3em);
+  top: max(calc(100svh - 3em), 500px);
   left: calc(50vw - 5em);
   height: 10em;
   width: 10em;
@@ -86,7 +86,7 @@ h1 {
 
 #target3 {
   position: absolute;
-  bottom: 100px;
+  top: max(calc(100% - 500px), 1000px);
   right: calc(50vw - 10em);
   height: 20em;
   width: 20em;
