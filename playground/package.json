@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "positionobserver": "file:../"
+    "position-observer": "file:../"
   },
   "devDependencies": {
     "typescript": "~5.8.3",

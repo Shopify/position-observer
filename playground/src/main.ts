@@ -1,4 +1,4 @@
-import { PositionObserver } from "positionobserver";
+import { PositionObserver } from "position-observer";
 
 window.PositionObserver = PositionObserver;
 
