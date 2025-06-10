@@ -229,6 +229,11 @@ npm test
 npm run test:ui
 ```
 
+## Acknowledgements
+
+- [@samthor](https://github.com/samthor) for earlier exploration of position observation techniques using IntersectionObserver: https://samthor.au/2021/observing-dom/
+- [@runjuu](https://github.com/runjuu) for transferring ownership of the `position-observer` package name on npm.
+
 ## License
 
 MIT License, refer to [LICENSE.md](./LICENSE.md)
