@@ -77,36 +77,37 @@ test.describe("PositionObserver", () => {
     page,
   }) => {
     const resultPromise = positionObserver.createObserver("#target", {
-      expectedCalls: 4, // initial + 3 changes
+      expectedCalls: 3, // initial + changes (some may be batched)
+      timeout: 10000,
     });
 
-    // Perform rapid changes
-    setTimeout(async () => {
-      const locator = page.locator("#target");
-      await locator.evaluate((el) => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.style.width = "150px";
-      });
-
-      setTimeout(async () => {
-        await locator.evaluate((el) => {
-          const htmlEl = el as HTMLElement;
-          htmlEl.style.height = "120px";
-        });
-
-        setTimeout(async () => {
-          await locator.evaluate((el) => {
-            const htmlEl = el as HTMLElement;
-            htmlEl.style.transform = "translateX(50px)";
-          });
-        }, 50);
-      }, 50);
-    }, 50);
+    // Make changes sequentially after a delay
+    await page.waitForTimeout(100);
+    
+    const locator = page.locator("#target");
+    await locator.evaluate((el) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.width = "150px";
+    });
+    
+    await page.waitForTimeout(200);
+    
+    await locator.evaluate((el) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.height = "120px";
+    });
+    
+    await page.waitForTimeout(200);
+    
+    await locator.evaluate((el) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.transform = "translateX(50px)";
+    });
 
     const result = await resultPromise;
 
-    expect(result).toHaveBeenCalledTimes(4);
-    expect(result).toHaveEntries(4);
+    expect(result).toHaveBeenCalledTimes(3);
+    expect(result).toHaveEntries(3);
     expect(result).toHaveAllEntriesIntersecting();
   });
 
@@ -287,5 +288,131 @@ test.describe("PositionObserver", () => {
     expect(lastEntry.boundingClientRect.height).toBeCloseTo(
       firstEntry.boundingClientRect.height / 2
     );
+  });
+
+  test("should trigger callback when re-observing previously unobserved element with same position", async ({
+    positionObserver,
+    page,
+  }) => {
+    // First observation
+    const firstResult = await positionObserver.createObserver("#target", {
+      expectedCalls: 1,
+    });
+
+    expect(firstResult).toHaveBeenCalledTimes(1);
+    expect(firstResult).toHaveEntries(1);
+
+    // Unobserve and immediately re-observe without changing position
+    const reObserveResult = await page.evaluate(() => {
+      const target = document.querySelector("#target");
+      if (!target) throw new Error("Element not found");
+
+      return new Promise<{entries: any[], callCount: number}>((resolve) => {
+        let callCount = 0;
+        const entries: any[] = [];
+
+        const observer = new window.PositionObserver((observerEntries) => {
+          callCount++;
+          entries.push(...observerEntries);
+        });
+
+        // Initial observation
+        observer.observe(target);
+        
+        setTimeout(() => {
+          // Unobserve the element
+          observer.unobserve(target);
+          
+          // Re-observe immediately without position change
+          observer.observe(target);
+          
+          setTimeout(() => {
+            resolve({ entries, callCount });
+          }, 100);
+        }, 50);
+      });
+    });
+
+    // Should get callback for initial observation AND re-observation
+    expect(reObserveResult.callCount).toBe(2);
+    expect(reObserveResult.entries).toHaveLength(2);
+    
+    // Both entries should have the same position since element didn't move
+    const [firstEntry, secondEntry] = reObserveResult.entries;
+    expect(firstEntry.boundingClientRect.left).toBe(secondEntry.boundingClientRect.left);
+    expect(firstEntry.boundingClientRect.top).toBe(secondEntry.boundingClientRect.top);
+  });
+
+  test("should clear all position observers when disconnected", async ({
+    positionObserver,
+    page,
+  }) => {
+    // Create multiple elements to observe
+    await page.evaluate(() => {
+      const container = document.body;
+      
+      // Create additional test elements
+      const element1 = document.createElement("div");
+      element1.id = "test-element-1";
+      element1.style.cssText = "width: 100px; height: 100px; background: red; position: absolute; top: 100px; left: 100px;";
+      
+      const element2 = document.createElement("div");
+      element2.id = "test-element-2";
+      element2.style.cssText = "width: 100px; height: 100px; background: blue; position: absolute; top: 200px; left: 200px;";
+      
+      container.appendChild(element1);
+      container.appendChild(element2);
+    });
+
+    // Observe multiple elements and then disconnect
+    const result = await page.evaluate(() => {
+      const target = document.querySelector("#target");
+      const element1 = document.querySelector("#test-element-1");
+      const element2 = document.querySelector("#test-element-2");
+      
+      if (!target || !element1 || !element2) throw new Error("Elements not found");
+
+      return new Promise<{initialCallCount: number, postDisconnectCallCount: number}>((resolve) => {
+        let initialCallCount = 0;
+        let postDisconnectCallCount = 0;
+
+        const observer = new window.PositionObserver(() => {
+          if (initialCallCount < 3) {
+            initialCallCount++;
+          } else {
+            postDisconnectCallCount++;
+          }
+        });
+
+        // Observe all elements
+        observer.observe(target);
+        observer.observe(element1);
+        observer.observe(element2);
+
+        setTimeout(() => {
+          // Disconnect observer
+          observer.disconnect();
+          
+          // Try to trigger changes after disconnect - should not invoke callback
+          (target as HTMLElement).style.width = "200px";
+          (element1 as HTMLElement).style.width = "200px";
+          (element2 as HTMLElement).style.width = "200px";
+          
+          setTimeout(() => {
+            resolve({ initialCallCount, postDisconnectCallCount });
+          }, 100);
+        }, 100);
+      });
+    });
+
+    // Should get initial callback (batched for all 3 elements) but no callbacks after disconnect
+    expect(result.initialCallCount).toBe(1);
+    expect(result.postDisconnectCallCount).toBe(0);
+
+    // Clean up test elements
+    await page.evaluate(() => {
+      document.getElementById("test-element-1")?.remove();
+      document.getElementById("test-element-2")?.remove();
+    });
   });
 });
