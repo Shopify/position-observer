@@ -95,6 +95,7 @@ export class PositionObserver {
     if (element) {
       this.#positionObservers.get(element)?.disconnect();
       this.#visibilityObserver.unobserve(element);
+      this.#positions.delete(element);
     } else {
       this.disconnect();
     }
@@ -108,6 +109,7 @@ export class PositionObserver {
       positionObserver.disconnect();
     }
 
+    this.#positionObservers.clear();
     this.#resizeObserver.disconnect();
     this.#rootBoundsObserver.disconnect();
     this.#visibilityObserver.disconnect();
