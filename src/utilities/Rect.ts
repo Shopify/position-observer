@@ -29,7 +29,7 @@ export class Rect {
   static clip(
     rect: DOMRect,
     clip: Pick<DOMRect, "top" | "right" | "bottom" | "left">
-  ) {
+  ): DOMRect {
     const updatedRect = {
       ...rect.toJSON(),
       top: rect.top + clip.top,
@@ -41,7 +41,12 @@ export class Rect {
     updatedRect.width = updatedRect.right - updatedRect.left;
     updatedRect.height = updatedRect.bottom - updatedRect.top;
 
-    return updatedRect;
+    return new DOMRect(
+      updatedRect.x,
+      updatedRect.y,
+      updatedRect.width,
+      updatedRect.height
+    );
   }
 
   /**
