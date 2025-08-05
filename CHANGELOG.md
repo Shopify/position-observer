@@ -1,5 +1,11 @@
 # position-observer
 
+## 1.0.2
+
+### Patch Changes
+
+- a9315f9: Fixed a bug where `intersectionRect` in `PositionObserverEntry` could sometimes be an object instead of an instance of `DOMRect`.
+
 ## 1.0.1
 
 ### Patch Changes
