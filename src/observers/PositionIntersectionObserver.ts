@@ -50,7 +50,7 @@ export class PositionIntersectionObserver {
    *
    * @returns The visible rectangle of the element within the root.
    */
-  get visibleRect() {
+  get visibleRect(): DOMRect {
     const clip = this.#options.clip;
     return clip ? Rect.clip(this.#clientRect, clip) : this.#clientRect;
   }
