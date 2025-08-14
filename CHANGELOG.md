@@ -1,5 +1,11 @@
 # position-observer
 
+## 1.0.3
+
+### Patch Changes
+
+- 74e7172: Fixed a regression with the `top` and `left` properties of the `intersectionRect` in `PositionObserverEntry`.
+
 ## 1.0.2
 
 ### Patch Changes
