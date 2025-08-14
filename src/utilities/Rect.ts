@@ -42,8 +42,8 @@ export class Rect {
     updatedRect.height = updatedRect.bottom - updatedRect.top;
 
     return new DOMRect(
-      updatedRect.x,
-      updatedRect.y,
+      updatedRect.left,
+      updatedRect.top,
       updatedRect.width,
       updatedRect.height
     );
