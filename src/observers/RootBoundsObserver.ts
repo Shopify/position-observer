@@ -1,3 +1,4 @@
+import { PositionObserver } from "../PositionObserver.ts";
 import { Rect } from "../utilities/Rect.ts";
 
 type Root = Document | Element;
@@ -21,48 +22,21 @@ export class RootBoundsObserver {
     const root = getRoot(target);
 
     if (isElement(root)) {
-      const ownerDocument = root.ownerDocument ?? document;
-
       this.rootBounds = root.getBoundingClientRect();
 
       /*
-       * Update the root bounds when the target element is resized.
+       * Use a PositionObserver (with no root option, i.e. observing against the viewport)
+       * to track root element position changes. This covers resize, scroll, AND
+       * CSS transform changes on ancestors — fixing stale rootBounds when an
+       * ancestor uses transform: translate() (e.g. canvas panning).
        */
-      this.#resizeObserver = new ResizeObserver((entries) => {
+      this.#positionObserver = new PositionObserver((entries) => {
         for (const entry of entries) {
-          const [{ inlineSize: width, blockSize: height }] =
-            entry.borderBoxSize;
-
-          if (Rect.sizeEqual(this.rootBounds, { width, height })) {
-            continue;
-          }
-
-          const rect = entry.target.getBoundingClientRect();
-
-          this.rootBounds = rect;
-          callback(rect, this);
+          this.rootBounds = entry.boundingClientRect;
+          callback(entry.boundingClientRect, this);
         }
       });
-      this.#resizeObserver.observe(root);
-
-      /*
-       * Update the root bounds when ancestors of the target element are scrolled.
-       */
-      ownerDocument.addEventListener(
-        "scroll",
-        (event) => {
-          if (
-            event.target &&
-            event.target !== root &&
-            isNode(event.target) &&
-            event.target.contains(root)
-          ) {
-            this.rootBounds = root.getBoundingClientRect();
-            callback(this.rootBounds, this);
-          }
-        },
-        { capture: true, passive: true, signal: this.#controller.signal }
-      );
+      this.#positionObserver.observe(root);
     } else {
       const viewport = root.visualViewport ?? root;
 
@@ -85,12 +59,12 @@ export class RootBoundsObserver {
   }
 
   /**
-   * The resize observer if the root is an element.
+   * The position observer if the root is an element.
    */
-  #resizeObserver: ResizeObserver | undefined;
+  #positionObserver: PositionObserver | undefined;
 
   /**
-   * The controller to disconnect the root bounds resize and scroll listeners.
+   * The controller to disconnect the viewport resize listener.
    */
   #controller: AbortController = new AbortController();
 
@@ -103,7 +77,7 @@ export class RootBoundsObserver {
    * Disconnects the root bounds observer.
    */
   public disconnect() {
-    this.#resizeObserver?.disconnect();
+    this.#positionObserver?.disconnect();
     this.#controller.abort();
   }
 }

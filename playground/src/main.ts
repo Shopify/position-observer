@@ -2,7 +2,8 @@ import { PositionObserver } from "position-observer";
 
 window.PositionObserver = PositionObserver;
 
-const targets: NodeListOf<HTMLElement> = document.querySelectorAll(".target");
+const targets: NodeListOf<HTMLElement> =
+  document.querySelectorAll(".target, h1");
 const debugElements = new Map<
   Element,
   {
@@ -44,36 +45,139 @@ const positionObserver = new PositionObserver(
   }
 );
 
-for (const target of targets) {
-  positionObserver.observe(target);
+// DVD Screensaver bouncing logic for #target
+const targetElement = document.getElementById("target") as HTMLElement;
+const appContainer = document.getElementById("app") as HTMLElement;
 
-  target.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    target.setPointerCapture(event.pointerId);
+// DVD screensaver variables
+let dvdX = 50; // Starting x position in pixels
+let dvdY = 50; // Starting y position in pixels
+let dvdVelocityX = 1.5; // Horizontal speed
+let dvdVelocityY = 1; // Vertical speed
 
-    target.style.cursor = "grabbing";
-  });
+function animateDVD() {
+  if (!targetElement || !appContainer) return;
 
-  target.addEventListener("pointermove", (event) => {
-    if (!target.hasPointerCapture(event.pointerId)) return;
+  // Get container dimensions (accounting for padding)
+  const containerRect = appContainer.getBoundingClientRect();
+  const containerStyles = window.getComputedStyle(appContainer);
+  const paddingLeft = parseFloat(containerStyles.paddingLeft);
+  const paddingTop = parseFloat(containerStyles.paddingTop);
+  const paddingRight = parseFloat(containerStyles.paddingRight);
+  const paddingBottom = parseFloat(containerStyles.paddingBottom);
 
-    event.preventDefault();
+  const containerWidth = containerRect.width - paddingLeft - paddingRight;
+  const containerHeight = containerRect.height - paddingTop - paddingBottom;
 
-    const style = getComputedStyle(target);
-    const [xString, yString] = style.translate.split(" ");
-    const currentX = parseFloat(xString);
-    const currentY = parseFloat(yString);
-    const x = isNaN(currentX) ? 0 : currentX;
-    const y = isNaN(currentY) ? 0 : currentY;
-    const { movementX, movementY } = event;
+  // Get target element dimensions
+  const targetRect = targetElement.getBoundingClientRect();
+  const targetWidth = targetRect.width;
+  const targetHeight = targetRect.height;
 
-    target.style.translate = `${x + movementX}px ${y + movementY}px`;
-  });
+  // Update position
+  dvdX += dvdVelocityX;
+  dvdY += dvdVelocityY;
 
-  target.addEventListener("pointerup", (event) => {
-    target.style.cursor = "";
-    target.releasePointerCapture(event.pointerId);
-  });
+  // Check for collision with walls and bounce
+  if (dvdX <= 0 || dvdX >= containerWidth - targetWidth) {
+    dvdVelocityX = -dvdVelocityX;
+    dvdX = Math.max(0, Math.min(dvdX, containerWidth - targetWidth));
+  }
+
+  if (dvdY <= 0 || dvdY >= containerHeight - targetHeight) {
+    dvdVelocityY = -dvdVelocityY;
+    dvdY = Math.max(0, Math.min(dvdY, containerHeight - targetHeight));
+  }
+
+  // Apply new position
+  targetElement.style.left = `${dvdX}px`;
+  targetElement.style.top = `${dvdY}px`;
+
+  requestAnimationFrame(animateDVD);
+}
+
+if (targetElement && appContainer) {
+  // Remove target element from drag/drop functionality
+  const filteredTargets = Array.from(targets).filter(
+    (target) => target.id !== "target"
+  );
+
+  // Set initial position
+  targetElement.style.position = "absolute";
+  targetElement.style.left = `${dvdX}px`;
+  targetElement.style.top = `${dvdY}px`;
+
+  // Start the animation
+  animateDVD();
+
+  // Observe the target for position tracking
+  positionObserver.observe(targetElement);
+
+  // Setup drag/drop for remaining targets (excluding #target)
+  for (const target of filteredTargets) {
+    positionObserver.observe(target);
+
+    target.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      target.setPointerCapture(event.pointerId);
+
+      target.style.cursor = "grabbing";
+    });
+
+    target.addEventListener("pointermove", (event) => {
+      if (!target.hasPointerCapture(event.pointerId)) return;
+
+      event.preventDefault();
+
+      const style = getComputedStyle(target);
+      const [xString, yString] = style.translate.split(" ");
+      const currentX = parseFloat(xString);
+      const currentY = parseFloat(yString);
+      const x = isNaN(currentX) ? 0 : currentX;
+      const y = isNaN(currentY) ? 0 : currentY;
+      const { movementX, movementY } = event;
+
+      target.style.translate = `${x + movementX}px ${y + movementY}px`;
+    });
+
+    target.addEventListener("pointerup", (event) => {
+      target.style.cursor = "";
+      target.releasePointerCapture(event.pointerId);
+    });
+  }
+} else {
+  // Fallback: setup drag/drop for all targets if elements not found
+  for (const target of targets) {
+    positionObserver.observe(target);
+
+    target.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      target.setPointerCapture(event.pointerId);
+
+      target.style.cursor = "grabbing";
+    });
+
+    target.addEventListener("pointermove", (event) => {
+      if (!target.hasPointerCapture(event.pointerId)) return;
+
+      event.preventDefault();
+
+      const style = getComputedStyle(target);
+      const [xString, yString] = style.translate.split(" ");
+      const currentX = parseFloat(xString);
+      const currentY = parseFloat(yString);
+      const x = isNaN(currentX) ? 0 : currentX;
+      const y = isNaN(currentY) ? 0 : currentY;
+      const { movementX, movementY } = event;
+
+      target.style.translate = `${x + movementX}px ${y + movementY}px`;
+    });
+
+    target.addEventListener("pointerup", (event) => {
+      target.style.cursor = "";
+      target.releasePointerCapture(event.pointerId);
+    });
+  }
 }
 
 document.addEventListener("pointerdown", (event) => {
