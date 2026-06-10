@@ -72,6 +72,36 @@ test.describe("PositionObserver", () => {
     expect(deltaY).toBe(50);
   });
 
+  test("should expose the previous bounding client rect on subsequent entries", async ({
+    positionObserver,
+  }) => {
+    const result = await positionObserver.moveElementAndWait("#target", {
+      x: 100,
+      y: 50,
+    });
+
+    expect(result).toHaveBeenCalledTimes(2);
+
+    const [firstEntry, secondEntry] = result.entries;
+
+    // First entry for a target has no previous rect
+    expect(firstEntry.previousBoundingClientRect).toBeUndefined();
+
+    // Second entry's previous rect is the first entry's bounding client rect
+    expect(secondEntry.previousBoundingClientRect?.left).toBe(
+      firstEntry.boundingClientRect.left
+    );
+    expect(secondEntry.previousBoundingClientRect?.top).toBe(
+      firstEntry.boundingClientRect.top
+    );
+    expect(secondEntry.previousBoundingClientRect?.width).toBe(
+      firstEntry.boundingClientRect.width
+    );
+    expect(secondEntry.previousBoundingClientRect?.height).toBe(
+      firstEntry.boundingClientRect.height
+    );
+  });
+
   test("should handle rapid consecutive changes", async ({
     positionObserver,
     page,
