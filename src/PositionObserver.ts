@@ -129,6 +129,7 @@ export class PositionObserver {
 
       if (isEntryEqual(entry, previousEntry)) continue;
 
+      entry.previousBoundingClientRect = previousEntry?.boundingClientRect;
       this.#positions.set(target, entry);
       records.push(entry);
     }
@@ -311,6 +312,12 @@ export class PositionObserverEntry {
      */
     public rootBounds: DOMRectReadOnly
   ) {}
+
+  /**
+   * The bounding client rect of the target element in the previously emitted
+   * entry, or `undefined` if this is the first entry for the target.
+   */
+  public previousBoundingClientRect?: DOMRectReadOnly;
 }
 
 /**
